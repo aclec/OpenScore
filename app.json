@@ -1,10 +1,10 @@
 {
     "expo": {
-        "name": "OpenScore",
-        "slug": "openscore",
+        "name": "OpenScores",
+        "slug": "openscores",
         "version": "1.0.0",
         "orientation": "portrait",
-        "scheme": "openscore",
+        "scheme": "openscores",
         "userInterfaceStyle": "automatic",
         "icon": "./assets/icon.png",
         "ios": {
