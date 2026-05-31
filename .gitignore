@@ -1,0 +1,31 @@
+# Dependencies
+node_modules/
+
+# Expo
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+
+# Uniwind (generated types)
+uniwind-env.d.ts
+
+# Native
+/ios/
+/android/
+
+# Metro
+.metro-health-check*
+
+# Debug
+*.log
+npm-debug.*
+
+# macOS
+.DS_Store
+
+# Env
+.env*.local
+/tasks/
+/.claude/
+/.idea/

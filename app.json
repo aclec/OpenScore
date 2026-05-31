@@ -1,0 +1,40 @@
+{
+    "expo": {
+        "name": "OpenScore",
+        "slug": "openscore",
+        "version": "1.0.0",
+        "orientation": "portrait",
+        "scheme": "openscore",
+        "userInterfaceStyle": "automatic",
+        "icon": "./assets/icon.png",
+        "ios": {
+            "supportsTablet": true,
+            "bundleIdentifier": "com.openscore.app"
+        },
+        "android": {
+            "package": "com.openscore.app",
+            "adaptiveIcon": {
+                "foregroundImage": "./assets/adaptive-icon.png",
+                "backgroundColor": "#FFFFFF"
+            }
+        },
+        "plugins": [
+            "expo-router",
+            "expo-status-bar",
+            [
+                "expo-splash-screen",
+                {
+                    "image": "./assets/splash-icon.png",
+                    "imageWidth": 220,
+                    "resizeMode": "contain",
+                    "backgroundColor": "#FFFFFF"
+                }
+            ],
+            "expo-sqlite",
+            "react-native-edge-to-edge"
+        ],
+        "experiments": {
+            "reactCompiler": true
+        }
+    }
+}

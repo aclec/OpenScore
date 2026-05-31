@@ -1,0 +1,6 @@
+node_modules
+.expo
+dist
+web-build
+uniwind-env.d.ts
+bun.lock

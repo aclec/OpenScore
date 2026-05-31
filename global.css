@@ -1,0 +1,48 @@
+@import "tailwindcss";
+@import "uniwind";
+
+/*
+ * OpenScore design tokens. Semantic colors come in light + `-dark` pairs;
+ * apply the dark one with Tailwind's `dark:` variant (driven by the system
+ * color scheme). Keep in sync with src/theme/colors.ts.
+ */
+@theme {
+    --color-accent: #2563eb;
+    --color-accent-dark: #60a5fa;
+    --color-accent-2: #3b82f6;
+    --color-accent-2-dark: #93c5fd;
+    --color-accent-soft: rgba(37, 99, 235, 0.08);
+    --color-accent-soft-dark: rgba(96, 165, 250, 0.14);
+
+    --color-bg: #ffffff;
+    --color-bg-dark: #0b0e1a;
+    --color-surface: #ffffff;
+    --color-surface-dark: #14182a;
+    --color-elevated: #fafafb;
+    --color-elevated-dark: #1a1f36;
+
+    --color-ink: #0b1020;
+    --color-ink-dark: #f1f5f9;
+    --color-ink2: #475569;
+    --color-ink2-dark: #cbd5e1;
+    --color-muted: #94a3b8;
+    --color-faint: #cbd5e1;
+    --color-faint-dark: #475569;
+
+    --color-line: rgba(15, 23, 42, 0.07);
+    --color-line-dark: rgba(255, 255, 255, 0.07);
+    --color-line-strong: rgba(15, 23, 42, 0.12);
+    --color-line-strong-dark: rgba(255, 255, 255, 0.14);
+
+    --color-keymuted: #f1f5f9;
+    --color-keymuted-dark: #1a1f36;
+    --color-draft: rgba(37, 99, 235, 0.05);
+    --color-draft-dark: rgba(96, 165, 250, 0.09);
+
+    --color-danger: #d93b1e;
+    --color-danger-dark: #f4633a;
+
+    /* Fixed surfaces (history "Reprendre" button) — same in both themes. */
+    --color-night: #0b1020;
+    --color-cream: #fff3e6;
+}
