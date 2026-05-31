@@ -3,6 +3,8 @@ import { Modal, Pressable, Text, TextInput, View } from "react-native";
 
 import { useColors } from "@/theme/colors";
 
+import { BottomSheet } from "../ui/BottomSheet";
+
 function MenuRow({ children, onPress, danger }: { children: string; onPress: () => void; danger?: boolean }) {
     return (
         <Pressable
@@ -32,33 +34,19 @@ export function GameMenu({
     onDelete: () => void;
 }) {
     return (
-        <Modal
+        <BottomSheet
             visible={visible}
-            transparent
-            animationType="slide"
-            onRequestClose={onClose}
-            statusBarTranslucent
+            onClose={onClose}
         >
-            <Pressable
-                className="flex-1 justify-end bg-night/40"
-                onPress={onClose}
+            <MenuRow onPress={onRename}>Renommer la partie</MenuRow>
+            <MenuRow onPress={onEnd}>Terminer la partie</MenuRow>
+            <MenuRow
+                danger
+                onPress={onDelete}
             >
-                <Pressable
-                    onPress={() => {}}
-                    className="rounded-t-[20px] bg-surface px-2 pb-safe-offset-4 pt-2.5 dark:bg-surface-dark"
-                >
-                    <View className="mx-auto mb-3 mt-1 h-1 w-9 rounded-full bg-line-strong dark:bg-line-strong-dark" />
-                    <MenuRow onPress={onRename}>Renommer la partie</MenuRow>
-                    <MenuRow onPress={onEnd}>Terminer la partie</MenuRow>
-                    <MenuRow
-                        danger
-                        onPress={onDelete}
-                    >
-                        Supprimer
-                    </MenuRow>
-                </Pressable>
-            </Pressable>
-        </Modal>
+                Supprimer
+            </MenuRow>
+        </BottomSheet>
     );
 }
 
@@ -91,6 +79,7 @@ export function RenameSheet({
             animationType="fade"
             onRequestClose={onCancel}
             statusBarTranslucent
+            supportedOrientations={["portrait", "landscape"]}
         >
             <Pressable
                 className="flex-1 items-center justify-center bg-night/40 px-6"

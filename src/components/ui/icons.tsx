@@ -61,6 +61,23 @@ export function Dots({ color, size = 3 }: IconProps) {
     );
 }
 
+/** Mini bar-chart glyph: three vertical bars of increasing height. */
+export function Chart({ color, size = 14 }: IconProps) {
+    const bar = (h: number) => ({
+        width: size * 0.2,
+        height: h,
+        borderRadius: 1.5,
+        backgroundColor: color,
+    });
+    return (
+        <View style={{ flexDirection: "row", alignItems: "flex-end", gap: size * 0.12, height: size }}>
+            <View style={bar(size * 0.5)} />
+            <View style={bar(size)} />
+            <View style={bar(size * 0.72)} />
+        </View>
+    );
+}
+
 /** Magnifier: a ring plus a short handle. */
 export function Search({ color, size = 14 }: IconProps) {
     const ring = size * 0.66;

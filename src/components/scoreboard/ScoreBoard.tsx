@@ -1,6 +1,6 @@
 import { useRouter } from "expo-router";
 import { useMemo, useState } from "react";
-import { View, type LayoutChangeEvent } from "react-native";
+import { useWindowDimensions, View, type LayoutChangeEvent } from "react-native";
 
 import { getRule } from "@/games";
 import type { Game } from "@/lib/types";
@@ -8,6 +8,7 @@ import { deleteActive, endActive, renameActive, setScore } from "@/store/gameSto
 import { useTotals } from "@/store/useGame";
 
 import { CalcKeyboard } from "../keyboard/CalcKeyboard";
+import { ChartsModal } from "./charts/ChartsModal";
 import { GameHeader } from "./Header";
 import { ScoreGrid, type Editing } from "./ScoreGrid";
 import { GameMenu, RenameSheet } from "./Sheets";
@@ -20,9 +21,12 @@ export function ScoreBoard({ game }: { game: Game }) {
     const router = useRouter();
     const rule = getRule(game.gameRuleId);
     const totals = useTotals(game);
+    const { width, height } = useWindowDimensions();
+    const landscape = width > height;
 
     const [editing, setEditing] = useState<Editing>(null);
     const [menuOpen, setMenuOpen] = useState(false);
+    const [chartsOpen, setChartsOpen] = useState(false);
     const [renaming, setRenaming] = useState(false);
     const [nameDraft, setNameDraft] = useState(game.name);
     const [containerW, setContainerW] = useState(390);
@@ -94,53 +98,78 @@ export function ScoreBoard({ game }: { game: Game }) {
 
     const onLayout = (e: LayoutChangeEvent) => setContainerW(e.nativeEvent.layout.width);
 
+    // Same keyboard, two layouts: a bottom sheet in portrait, a docked half-screen
+    // column beside the grid in landscape (returns null while no cell is being edited).
+    const keyboard = (variant: "sheet" | "side") => (
+        <CalcKeyboard
+            variant={variant}
+            open={!!editing}
+            playerName={editingPlayer?.name}
+            initial={editingValue}
+            suggested={suggestedFill}
+            isLastInRound={isLastInRound}
+            players={editing ? game.players : []}
+            roundScores={roundScores}
+            currentPlayerId={editing?.playerId}
+            onValidate={(v) => {
+                if (editing && v !== null) setScore(editing.roundIndex, editing.playerId, v);
+                setEditing(null);
+            }}
+            onNext={(v) => {
+                const wasSet = !!editing && v !== null;
+                if (editing && wasSet) setScore(editing.roundIndex, editing.playerId, v);
+                goNext(wasSet ? editing!.playerId : null);
+            }}
+            onSwitchPlayer={(targetId, value) => {
+                if (!editing) return;
+                if (value !== null) setScore(editing.roundIndex, editing.playerId, value);
+                setEditing({ roundIndex: editing.roundIndex, playerId: targetId });
+            }}
+            onCancel={() => setEditing(null)}
+        />
+    );
+
     return (
-        <View
-            className="flex-1 bg-bg dark:bg-bg-dark"
-            onLayout={onLayout}
-        >
-            <GameHeader
-                game={game}
-                rule={rule}
-                progress={progress}
-                onMenu={() => setMenuOpen(true)}
-            />
+        // px-safe keeps content clear of the side notch when rotated to landscape
+        // (0 in portrait). Top/bottom insets are handled per-panel below.
+        <View className="flex-1 bg-bg px-safe dark:bg-bg-dark">
+            {/* Landscape: hide the header while the keyboard is docked so the keys
+                get the full height (otherwise they're cramped on a phone). */}
+            {!(landscape && editing) && (
+                <GameHeader
+                    game={game}
+                    rule={rule}
+                    progress={progress}
+                    onCharts={() => setChartsOpen(true)}
+                    onMenu={() => setMenuOpen(true)}
+                />
+            )}
 
-            <ScoreGrid
-                game={game}
-                rounds={displayRounds}
-                totals={totals}
-                colW={colW}
-                labelW={LABEL_W}
-                rowH={ROW_H}
-                editing={editing}
-                onEditCell={(roundIndex, playerId) => setEditing({ roundIndex, playerId })}
-            />
+            <View className={landscape ? "flex-1 flex-row" : "flex-1"}>
+                <View
+                    className="flex-1"
+                    onLayout={onLayout}
+                >
+                    <ScoreGrid
+                        game={game}
+                        rounds={displayRounds}
+                        totals={totals}
+                        colW={colW}
+                        labelW={LABEL_W}
+                        rowH={ROW_H}
+                        editing={editing}
+                        onEditCell={(roundIndex, playerId) => setEditing({ roundIndex, playerId })}
+                    />
+                </View>
+                {landscape && keyboard("side")}
+            </View>
 
-            <CalcKeyboard
-                open={!!editing}
-                playerName={editingPlayer?.name}
-                initial={editingValue}
-                suggested={suggestedFill}
-                isLastInRound={isLastInRound}
-                players={editing ? game.players : []}
-                roundScores={roundScores}
-                currentPlayerId={editing?.playerId}
-                onValidate={(v) => {
-                    if (editing && v !== null) setScore(editing.roundIndex, editing.playerId, v);
-                    setEditing(null);
-                }}
-                onNext={(v) => {
-                    const wasSet = !!editing && v !== null;
-                    if (editing && wasSet) setScore(editing.roundIndex, editing.playerId, v);
-                    goNext(wasSet ? editing!.playerId : null);
-                }}
-                onSwitchPlayer={(targetId, value) => {
-                    if (!editing) return;
-                    if (value !== null) setScore(editing.roundIndex, editing.playerId, value);
-                    setEditing({ roundIndex: editing.roundIndex, playerId: targetId });
-                }}
-                onCancel={() => setEditing(null)}
+            {!landscape && keyboard("sheet")}
+
+            <ChartsModal
+                visible={chartsOpen}
+                onClose={() => setChartsOpen(false)}
+                game={game}
             />
 
             <GameMenu

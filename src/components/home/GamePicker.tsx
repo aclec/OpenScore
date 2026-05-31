@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { Modal, Pressable, Text, View } from "react-native";
+import { Pressable, ScrollView, Text, View } from "react-native";
 
 import { DEFAULT_RULE, GAMES, getRule, isDefault, ruleCapLabel } from "@/games";
 import type { GameRule } from "@/games";
 import { useColors } from "@/theme/colors";
 
+import { BottomSheet } from "../ui/BottomSheet";
 import { Num } from "../ui/Txt";
 import { Check } from "../ui/icons";
 
@@ -91,34 +92,24 @@ export function GamePicker({ ruleId, onSelect }: { ruleId: string; onSelect: (id
             </View>
             <Text className="mt-2.5 text-[13px] leading-[18px] text-muted">{getRule(ruleId).description}</Text>
 
-            <Modal
+            <BottomSheet
                 visible={open}
-                transparent
-                animationType="slide"
-                onRequestClose={() => setOpen(false)}
-                statusBarTranslucent
+                onClose={() => setOpen(false)}
+                header={
+                    <Text className="px-1 pb-1 pt-1 text-[11px] font-bold uppercase tracking-[1.5px] text-muted">Choisir un jeu</Text>
+                }
             >
-                <Pressable
-                    className="flex-1 justify-end bg-night/40"
-                    onPress={() => setOpen(false)}
-                >
-                    <Pressable
-                        onPress={() => {}}
-                        className="rounded-t-[24px] bg-surface px-3 pb-safe-offset-4 pt-2.5 dark:bg-surface-dark"
-                    >
-                        <View className="mx-auto mb-1 mt-1 h-1 w-9 rounded-full bg-line-strong dark:bg-line-strong-dark" />
-                        <Text className="px-2 pb-1.5 pt-2 text-[11px] font-bold uppercase tracking-[1.5px] text-muted">Choisir un jeu</Text>
-                        {SORTED_GAMES.map((g) => (
-                            <GameRow
-                                key={g.id}
-                                name={g.name}
-                                selected={g.id === ruleId}
-                                onPress={() => pick(g.id)}
-                            />
-                        ))}
-                    </Pressable>
-                </Pressable>
-            </Modal>
+                <ScrollView showsVerticalScrollIndicator={false}>
+                    {SORTED_GAMES.map((g) => (
+                        <GameRow
+                            key={g.id}
+                            name={g.name}
+                            selected={g.id === ruleId}
+                            onPress={() => pick(g.id)}
+                        />
+                    ))}
+                </ScrollView>
+            </BottomSheet>
         </View>
     );
 }

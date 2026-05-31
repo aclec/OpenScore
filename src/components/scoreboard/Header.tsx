@@ -5,17 +5,18 @@ import type { Game } from "@/lib/types";
 import { useColors } from "@/theme/colors";
 
 import { IconButton } from "../ui/IconButton";
-import { Dots } from "../ui/icons";
+import { Chart, Dots } from "../ui/icons";
 
 type Props = {
     game: Game;
     rule: GameRule;
     /** 0..1 progress toward maxScore, or null when not applicable. */
     progress: number | null;
+    onCharts: () => void;
     onMenu: () => void;
 };
 
-export function GameHeader({ game, rule, progress, onMenu }: Props) {
+export function GameHeader({ game, rule, progress, onCharts, onMenu }: Props) {
     const c = useColors();
     return (
         <View className="border-b border-line bg-bg px-4 pb-3.5 pt-safe-offset-2 dark:border-line-dark dark:bg-bg-dark">
@@ -32,6 +33,15 @@ export function GameHeader({ game, rule, progress, onMenu }: Props) {
                         {game.name}
                     </Text>
                 </View>
+                <IconButton
+                    onPress={onCharts}
+                    accessibilityLabel="Graphiques"
+                >
+                    <Chart
+                        color={c.ink}
+                        size={14}
+                    />
+                </IconButton>
                 <IconButton
                     onPress={onMenu}
                     accessibilityLabel="Menu"
