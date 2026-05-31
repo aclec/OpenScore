@@ -1,7 +1,7 @@
 {
     "expo": {
         "name": "OpenScores",
-        "slug": "openscores",
+        "slug": "openscore",
         "version": "1.1.0",
         "orientation": "default",
         "scheme": "openscore",
