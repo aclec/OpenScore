@@ -4,7 +4,7 @@
         "slug": "openscores",
         "version": "1.1.0",
         "orientation": "default",
-        "scheme": "openscores",
+        "scheme": "openscore",
         "userInterfaceStyle": "automatic",
         "icon": "./assets/icon.png",
         "ios": {
