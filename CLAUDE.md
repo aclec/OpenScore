@@ -15,7 +15,6 @@ OpenScore is a native (iOS / Android) score-tracking app built with Expo.
 | Language        | TypeScript (strict)                        |
 | Navigation      | `expo-router` (file-based, in `src/app/`)  |
 | Styling         | **uniwind** (Tailwind v4) — NOT NativeWind |
-| Native UI       | `@expo/ui` (SwiftUI / Jetpack Compose)     |
 | KV store        | `react-native-mmkv`                        |
 | Database        | `expo-sqlite`                              |
 | Lint / format   | ESLint (`eslint-config-expo`) + Prettier   |
@@ -31,7 +30,7 @@ src/
     (tabs)/
       _layout.tsx         # bottom tabs (headers off; screens own their headers)
       index.tsx           # Games list (SQLite)
-      settings.tsx        # Settings (MMKV + @expo/ui switch)
+      settings.tsx        # Settings (MMKV)
   components/             # reusable UI; *.ios/*.android for native variants
   db/                     # expo-sqlite: client, schema, queries
   store/                  # MMKV instance + typed hooks
@@ -49,7 +48,7 @@ Path alias: `@/*` → `src/*`.
 - **Safe areas use uniwind classes** (`pt-safe`, `pt-safe-offset-*`, `px-safe`, …) — do NOT wrap screens in `SafeAreaView`. uniwind's free tier does NOT auto-inject native insets: `SafeAreaBridge` (in `src/app/_layout.tsx`) feeds them via `Uniwind.updateInsets()`, and also provides the context for `useSafeAreaInsets` (used where a numeric inset is needed in a plain style, e.g. FlashList `contentContainerStyle`). Without it every `*-safe` class resolves to 0 on native.
 - Dark mode uses Tailwind's `dark:` variant (system `prefers-color-scheme`).
 - **Storage split:** the single **in-progress game** lives in **MMKV** (`src/store/active.ts`) — it needs synchronous, race-free writes on every score and is one blob read/written whole. **Finished games** go to **SQLite** (`src/db/history.ts`), one row per game with the document stored as JSON in `data` and `ended_at` duplicated as a column for ordering. Small **preferences** also use MMKV. SQLite is intentionally not normalised yet: you can't query *inside* a game (e.g. cross-history per-player stats) without parsing the JSON — normalise (`games`/`players`/`rounds`/`scores`) only if/when such stats are needed.
-- Platform-specific UI (`@expo/ui`) goes in `*.ios.tsx` / `*.android.tsx` files sharing a `*.types.ts`.
+- Platform-specific UI goes in `*.ios.tsx` / `*.android.tsx` files sharing a `*.types.ts`.
 
 ## Commands
 
@@ -64,7 +63,7 @@ bun run format         # prettier --write .
 
 ## Gotchas
 
-- `react-native-mmkv` and `@expo/ui` require a **dev build** (not Expo Go).
+- `react-native-mmkv` requires a **dev build** (not Expo Go).
 - uniwind needs **no Babel plugin**; it works through the Metro plugin only.
 - After editing `global.css`, restart Metro to regenerate `uniwind-env.d.ts`.
 - Reanimated 4's worklets Babel plugin is provided by `babel-preset-expo` — do not add it manually (causes a duplicate-plugin error).

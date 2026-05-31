@@ -16,13 +16,12 @@ per-game rules (point caps, round limits, auto-fill, …).
 | Language        | TypeScript (strict)                          |
 | Navigation      | `expo-router` (file-based, in `src/app/`)    |
 | Styling         | **uniwind** (Tailwind v4) — _not_ NativeWind |
-| Native UI       | `@expo/ui` (SwiftUI / Jetpack Compose)       |
 | KV store        | `react-native-mmkv` — active game + prefs    |
 | Database        | `expo-sqlite` — finished-game history         |
 
 ## Getting started
 
-`react-native-mmkv` and `@expo/ui` need a **dev build** — Expo Go won't work.
+`react-native-mmkv` needs a **dev build** — Expo Go won't work.
 
 ```bash
 bun install

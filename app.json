@@ -9,10 +9,13 @@
         "icon": "./assets/icon.png",
         "ios": {
             "supportsTablet": true,
-            "bundleIdentifier": "com.openscore.app"
+            "bundleIdentifier": "com.openscores.app",
+            "infoPlist": {
+                "ITSAppUsesNonExemptEncryption": false
+            }
         },
         "android": {
-            "package": "com.openscore.app",
+            "package": "com.openscores.app",
             "adaptiveIcon": {
                 "foregroundImage": "./assets/adaptive-icon.png",
                 "backgroundColor": "#FFFFFF"
@@ -35,6 +38,12 @@
         ],
         "experiments": {
             "reactCompiler": true
+        },
+        "extra": {
+            "router": {},
+            "eas": {
+                "projectId": "49f1aa51-50cd-4ac1-b058-608cadac1c76"
+            }
         }
     }
 }

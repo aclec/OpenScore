@@ -5,7 +5,6 @@
     "": {
       "name": "openscore",
       "dependencies": {
-        "@expo/ui": "56.0.15",
         "@shopify/flash-list": "2.0.2",
         "babel-plugin-react-compiler": "^1.0.0",
         "expo": "56.0.8",

@@ -61,9 +61,7 @@ function Segment({ title, meta, selected, onPress }: { title: string; meta: stri
 
 /**
  * Game selector: two segments — "Défaut" (free counter) and "Jeux". Tapping "Jeux"
- * opens an @expo/ui BottomSheet listing the real games; the segment then shows the
- * chosen game. The sheet content is built from @expo/ui universal primitives because
- * BottomSheet renders its children inside a native Host.
+ * opens a modal listing the real games; the segment then shows the chosen game.
  */
 export function GamePicker({ ruleId, onSelect }: { ruleId: string; onSelect: (id: string) => void }) {
     const [open, setOpen] = useState(false);
