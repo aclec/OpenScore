@@ -24,7 +24,7 @@ export function Detail({ gameId }: { gameId: string }) {
     if (!game) {
         return (
             <View className="flex-1 items-center justify-center bg-bg dark:bg-bg-dark">
-                <Text className="text-muted">Partie introuvable.</Text>
+                <Text className=" text-muted">Partie introuvable.</Text>
             </View>
         );
     }

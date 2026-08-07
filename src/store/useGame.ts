@@ -2,6 +2,7 @@
 
 import { useMemo, useSyncExternalStore } from "react";
 
+import type { GameRule } from "@/games";
 import { computeTotals } from "@/lib/game";
 import type { Game, Totals } from "@/lib/types";
 
@@ -17,6 +18,16 @@ export function useActiveGame(): Game | null {
 
 export function useHistory(): Game[] {
     return useAppState().history;
+}
+
+/** User-created rules, creation order. */
+export function useCustomRules(): GameRule[] {
+    return useAppState().customs;
+}
+
+export function useCustomRule(id: string | undefined): GameRule | null {
+    const customs = useCustomRules();
+    return customs.find((r) => r.id === id) ?? null;
 }
 
 /** Memoised running totals for a game. */

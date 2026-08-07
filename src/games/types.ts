@@ -18,4 +18,6 @@ export type GameRule = {
     autoFillLast?: boolean;
     allowNegative?: boolean;
     description: string;
+    /** Creation timestamp — custom rules only, orders the "Mes jeux" list. */
+    createdAt?: number;
 };

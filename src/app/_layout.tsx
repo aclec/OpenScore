@@ -27,6 +27,8 @@ export default function RootLayout() {
                     <Stack.Screen name="game" />
                     <Stack.Screen name="history" />
                     <Stack.Screen name="detail/[id]" />
+                    <Stack.Screen name="custom/index" />
+                    <Stack.Screen name="custom/[id]" />
                 </Stack>
             </SafeAreaBridge>
         </GestureHandlerRootView>

@@ -1,15 +1,17 @@
 // Reactive app store: the active game (MMKV) + finished history (SQLite).
 // Plain external store consumed via useSyncExternalStore — no Context, no Redux.
 
+import * as customGames from "@/db/customGames";
 import * as history from "@/db/history";
+import { setCustomRules, type GameRule } from "@/games";
 import { cloneGame, uid } from "@/lib/game";
 import type { Game } from "@/lib/types";
 
 import { loadActiveGame, persistActiveGame } from "./active";
 
-export type AppState = { active: Game | null; history: Game[] };
+export type AppState = { active: Game | null; history: Game[]; customs: GameRule[] };
 
-let state: AppState = { active: null, history: [] };
+let state: AppState = { active: null, history: [], customs: [] };
 let hydrated = false;
 
 const listeners = new Set<() => void>();
@@ -25,7 +27,9 @@ function set(next: Partial<AppState>, persistActive = true): void {
 /** Loads persisted data into memory. Call once after the DB is initialised. */
 export function hydrate(): void {
     if (hydrated) return;
-    state = { active: loadActiveGame(), history: history.listHistory() };
+    const customs = customGames.listCustomGames();
+    setCustomRules(customs);
+    state = { active: loadActiveGame(), history: history.listHistory(), customs };
     hydrated = true;
     emit();
 }
@@ -67,6 +71,31 @@ export function endActive(): void {
 
 export function deleteActive(): void {
     set({ active: null });
+}
+
+// ── Custom rules ───────────────────────────────────────────────────────────
+// The registry backing `getRule` is a plain module variable, so it is refreshed
+// alongside the reactive state on every write.
+
+function setCustoms(customs: GameRule[]): void {
+    setCustomRules(customs);
+    set({ customs }, false);
+}
+
+/** Creates the rule, or replaces it when a rule with the same id already exists. */
+export function saveCustomRule(rule: GameRule): void {
+    customGames.upsertCustomGame(rule);
+    const known = state.customs.some((r) => r.id === rule.id);
+    setCustoms(known ? state.customs.map((r) => (r.id === rule.id ? rule : r)) : [...state.customs, rule]);
+}
+
+/**
+ * Removes a custom rule. Games (active or in history) that referenced it keep
+ * their `gameRuleId` and fall back to the free counter via `getRule`.
+ */
+export function deleteCustomRule(id: string): void {
+    customGames.deleteCustomGame(id);
+    setCustoms(state.customs.filter((r) => r.id !== id));
 }
 
 export function deleteHistory(id: string): void {

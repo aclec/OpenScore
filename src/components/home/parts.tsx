@@ -52,7 +52,7 @@ export function PlayerRow({
                     hitSlop={8}
                     className="h-7 w-7 items-center justify-center rounded-full bg-keymuted active:opacity-70 dark:bg-keymuted-dark"
                 >
-                    <Text className="text-base leading-none text-muted">×</Text>
+                    <Text className=" text-base leading-none text-muted">×</Text>
                 </Pressable>
             )}
         </View>
@@ -70,7 +70,7 @@ export function AddPlayerButton({ onPress, disabled }: { onPress: () => void; di
             accessibilityState={{ disabled }}
             className={`mt-3 flex-row items-center justify-center gap-1.5 rounded-xl border border-dashed border-line py-3 dark:border-line-dark ${disabled ? "opacity-40" : "active:opacity-70"}`}
         >
-            <Text className="text-lg leading-none text-accent">+</Text>
+            <Text className=" text-lg leading-none text-accent">+</Text>
             <Text className="text-sm font-semibold text-ink dark:text-ink-dark">Ajouter un joueur</Text>
         </Pressable>
     );

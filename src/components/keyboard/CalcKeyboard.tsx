@@ -170,7 +170,7 @@ function KeyboardBody(props: CalcKeyboardProps) {
                 <CalcKey label="0" wide fill={side} onPress={() => push("0")} />
                 <CalcKey label="," a11yLabel="Virgule" fill={side} onPress={() => push(".")} fontSize={26} fontWeight="700" />
                 <CalcKey
-                    label={<Text className="text-[22px] text-ink dark:text-ink-dark">⌫</Text>}
+                    label={<Text className=" text-[22px] text-ink dark:text-ink-dark">⌫</Text>}
                     a11yLabel="Supprimer le dernier chiffre"
                     variant="op"
                     fill={side}

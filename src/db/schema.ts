@@ -9,4 +9,12 @@ CREATE TABLE IF NOT EXISTS history (
   data TEXT NOT NULL,
   ended_at INTEGER NOT NULL
 );
+
+-- User-created game rules. Same shape as history: the GameRule document is stored
+-- as JSON in data, created_at duplicated as a column so the list keeps its order.
+CREATE TABLE IF NOT EXISTS custom_games (
+  id TEXT PRIMARY KEY NOT NULL,
+  data TEXT NOT NULL,
+  created_at INTEGER NOT NULL
+);
 `;

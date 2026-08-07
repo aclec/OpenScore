@@ -1,11 +1,11 @@
 import { useRouter } from "expo-router";
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, TextInput, type TextInputProps, View } from "react-native";
 
 import { getRule } from "@/games";
 import { createGame, todayLabel } from "@/lib/game";
 import { startGame } from "@/store/gameStore";
-import { useHistory } from "@/store/useGame";
+import { useCustomRules, useHistory } from "@/store/useGame";
 import { useColors } from "@/theme/colors";
 
 import { PrimaryButton } from "../ui/PrimaryButton";
@@ -27,21 +27,24 @@ export function NewGame() {
     const router = useRouter();
     const c = useColors();
     const history = useHistory();
+    const customs = useCustomRules();
     const scroll = useRef<ScrollView>(null);
 
     const [name, setName] = useState("");
     const [ruleId, setRuleId] = useState("defaut");
-    const [players, setPlayers] = useState(() => clamp([], getRule("defaut").minPlayers, getRule("defaut").maxPlayers));
+    const [entered, setEntered] = useState<string[]>([]);
     const rule = getRule(ruleId);
 
-    const changeRule = (id: string) => {
-        const r = getRule(id);
-        setRuleId(id);
-        setPlayers((p) => clamp(p, r.minPlayers, r.maxPlayers));
-    };
+    // Clamped at render, not on selection: a custom rule can be edited from "Mes jeux"
+    // while this form stays mounted, so its bounds must always win over the typed rows.
+    const players = useMemo(() => clamp(entered, rule.minPlayers, rule.maxPlayers), [entered, rule.minPlayers, rule.maxPlayers]);
 
-    const addPlayer = () => setPlayers((p) => (p.length < rule.maxPlayers ? [...p, ""] : p));
-    const removePlayer = (i: number) => setPlayers((p) => (p.length > rule.minPlayers ? p.filter((_, idx) => idx !== i) : p));
+    const addPlayer = () => {
+        if (players.length < rule.maxPlayers) setEntered([...players, ""]);
+    };
+    const removePlayer = (i: number) => {
+        if (players.length > rule.minPlayers) setEntered(players.filter((_, idx) => idx !== i));
+    };
 
     const start = () => {
         startGame(createGame({ name, gameRuleId: ruleId, players }));
@@ -59,16 +62,31 @@ export function NewGame() {
             className="flex-1 bg-bg dark:bg-bg-dark"
             behavior={Platform.OS === "ios" ? "padding" : undefined}
         >
+            {/*
+             * The keyboard stays up for the whole form: filling several player
+             * names means tapping between fields and scrolling, and losing the
+             * keyboard on every one of those is what made the flow painful.
+             * Both inputs keep returnKeyType="done" as the way out.
+             */}
             <ScrollView
                 ref={scroll}
                 className="flex-1"
                 contentContainerClassName="pt-safe-offset-3 pb-6"
-                keyboardShouldPersistTaps="handled"
-                keyboardDismissMode="on-drag"
+                keyboardShouldPersistTaps="always"
+                keyboardDismissMode="none"
                 showsVerticalScrollIndicator={false}
             >
                 <View className="px-6 pt-3">
-                    <View className="mb-3.5 flex-row items-center justify-end">
+                    <View className="mb-3.5 flex-row items-center justify-end gap-2">
+                        <Pressable
+                            onPress={() => router.push("/custom")}
+                            accessibilityRole="button"
+                            accessibilityLabel={`Mes jeux, ${customs.length}`}
+                            className="flex-row items-center gap-1.5 rounded-full bg-keymuted px-2.5 py-1.5 active:opacity-70 dark:bg-keymuted-dark"
+                        >
+                            <Text className="text-xs font-semibold text-ink dark:text-ink-dark">Mes jeux</Text>
+                            <Num className="text-xs font-bold text-muted">{customs.length}</Num>
+                        </Pressable>
                         <Pressable
                             onPress={() => router.push("/history")}
                             accessibilityRole="button"
@@ -110,7 +128,7 @@ export function NewGame() {
                     <Field label="Jeu">
                         <GamePicker
                             ruleId={ruleId}
-                            onSelect={changeRule}
+                            onSelect={setRuleId}
                         />
                     </Field>
 
@@ -122,7 +140,7 @@ export function NewGame() {
                                     index={i}
                                     value={p}
                                     last={i === players.length - 1}
-                                    onChange={(v) => setPlayers((arr) => arr.map((x, idx) => (idx === i ? v : x)))}
+                                    onChange={(v) => setEntered(players.map((x, idx) => (idx === i ? v : x)))}
                                     onFocus={reveal}
                                     onRemove={players.length > rule.minPlayers ? () => removePlayer(i) : undefined}
                                 />

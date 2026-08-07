@@ -1,77 +1,49 @@
-import { useState } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { useRouter } from "expo-router";
+import { useEffect, useMemo, useState } from "react";
+import { ScrollView, Text, View } from "react-native";
 
-import { DEFAULT_RULE, GAMES, getRule, isDefault, ruleCapLabel } from "@/games";
+import { DEFAULT_RULE, GAMES, getRule, isDefault, ruleMeta } from "@/games";
 import type { GameRule } from "@/games";
-import { useColors } from "@/theme/colors";
+import { useCustomRules } from "@/store/useGame";
 
 import { BottomSheet } from "../ui/BottomSheet";
-import { Num } from "../ui/Txt";
-import { Check } from "../ui/icons";
+import { GameRow, ManageRow, Segment, SheetSection } from "./pickerParts";
 
-/** Games listed alphabetically — case-sensitive, numerals compared by value (numeric). */
-const SORTED_GAMES = [...GAMES].sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: "case" }));
+/** Alphabetical — case-sensitive, numerals compared by value (numeric). */
+const byName = (a: GameRule, b: GameRule) => a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: "case" });
 
-/** "250/manche · 3–6 j." style summary line for a rule. */
-function ruleMeta(rule: GameRule): string {
-    const range = rule.maxPlayers !== rule.minPlayers ? `${rule.minPlayers}–${rule.maxPlayers}` : `${rule.minPlayers}`;
-    return `${ruleCapLabel(rule)} · ${range} j.`;
-}
-
-/** A single game row in the picker sheet — name only, with a check when selected. */
-function GameRow({ name, selected, onPress }: { name: string; selected: boolean; onPress: () => void }) {
-    const c = useColors();
-    return (
-        <Pressable
-            onPress={onPress}
-            accessibilityRole="button"
-            accessibilityState={{ selected }}
-            accessibilityLabel={name}
-            className={`flex-row items-center justify-between rounded-[14px] px-4 py-4 active:bg-keymuted dark:active:bg-keymuted-dark ${
-                selected ? "bg-accent-soft dark:bg-accent-soft-dark" : ""
-            }`}
-        >
-            <Text className={`text-[17px] font-semibold ${selected ? "text-accent" : "text-ink dark:text-ink-dark"}`}>{name}</Text>
-            {selected && (
-                <Check
-                    color={c.accent}
-                    size={15}
-                    weight={2.5}
-                />
-            )}
-        </Pressable>
-    );
-}
-
-function Segment({ title, meta, selected, onPress }: { title: string; meta: string; selected: boolean; onPress: () => void }) {
-    return (
-        <Pressable
-            onPress={onPress}
-            accessibilityRole="button"
-            accessibilityState={{ selected }}
-            accessibilityLabel={`${title}, ${meta}`}
-            className={`flex-1 gap-1 rounded-xl border-[1.5px] px-3 py-3.5 ${
-                selected ? "border-accent bg-accent-soft dark:bg-accent-soft-dark" : "border-line dark:border-line-dark"
-            }`}
-        >
-            <Text className="text-[15px] font-semibold text-ink dark:text-ink-dark">{title}</Text>
-            <Num className="text-[11px] font-medium text-muted">{meta}</Num>
-        </Pressable>
-    );
-}
+const SORTED_GAMES = [...GAMES].sort(byName);
 
 /**
  * Game selector: two segments — "Défaut" (free counter) and "Jeux". Tapping "Jeux"
- * opens a modal listing the real games; the segment then shows the chosen game.
+ * opens a modal listing the built-in games plus the user's own; the segment then
+ * shows the chosen game.
  */
 export function GamePicker({ ruleId, onSelect }: { ruleId: string; onSelect: (id: string) => void }) {
+    const router = useRouter();
     const [open, setOpen] = useState(false);
+    const customs = useCustomRules();
+    const sortedCustoms = useMemo(() => [...customs].sort(byName), [customs]);
+
+    const rule = getRule(ruleId);
     const onDefault = isDefault(ruleId);
-    const selectedGame = onDefault ? null : getRule(ruleId);
+    // A custom game deleted from another screen leaves a dangling id: `getRule`
+    // already falls back, and the selection follows it back to the free counter.
+    const missing = !onDefault && rule.id !== ruleId;
+    useEffect(() => {
+        if (missing) onSelect(DEFAULT_RULE.id);
+    }, [missing, onSelect]);
+
+    const selectedGame = onDefault || missing ? null : rule;
 
     const pick = (id: string) => {
         onSelect(id);
         setOpen(false);
+    };
+
+    const goToCustoms = (path: "/custom" | "/custom/new") => {
+        setOpen(false);
+        router.push(path);
     };
 
     return (
@@ -80,24 +52,22 @@ export function GamePicker({ ruleId, onSelect }: { ruleId: string; onSelect: (id
                 <Segment
                     title={DEFAULT_RULE.name}
                     meta="Compteur libre"
-                    selected={onDefault}
+                    selected={onDefault || missing}
                     onPress={() => onSelect(DEFAULT_RULE.id)}
                 />
                 <Segment
                     title={selectedGame ? selectedGame.name : "Jeux"}
                     meta={selectedGame ? ruleMeta(selectedGame) : "Choisir un jeu"}
-                    selected={!onDefault}
+                    selected={!!selectedGame}
                     onPress={() => setOpen(true)}
                 />
             </View>
-            <Text className="mt-2.5 text-[13px] leading-[18px] text-muted">{getRule(ruleId).description}</Text>
+            <Text className="mt-2.5 text-[13px] leading-[18px] text-muted">{rule.description}</Text>
 
             <BottomSheet
                 visible={open}
                 onClose={() => setOpen(false)}
-                header={
-                    <Text className="px-1 pb-1 pt-1 text-[11px] font-bold uppercase tracking-[1.5px] text-muted">Choisir un jeu</Text>
-                }
+                header={<Text className="px-1 pb-1 pt-1 text-[11px] font-bold uppercase tracking-[1.5px] text-muted">Choisir un jeu</Text>}
             >
                 <ScrollView showsVerticalScrollIndicator={false}>
                     {SORTED_GAMES.map((g) => (
@@ -108,6 +78,22 @@ export function GamePicker({ ruleId, onSelect }: { ruleId: string; onSelect: (id
                             onPress={() => pick(g.id)}
                         />
                     ))}
+
+                    {sortedCustoms.length > 0 && <SheetSection label="Mes jeux" />}
+                    {sortedCustoms.map((g) => (
+                        <GameRow
+                            key={g.id}
+                            name={g.name}
+                            selected={g.id === ruleId}
+                            onPress={() => pick(g.id)}
+                        />
+                    ))}
+
+                    <ManageRow
+                        onPress={() => goToCustoms(sortedCustoms.length ? "/custom" : "/custom/new")}
+                        label={sortedCustoms.length ? "Gérer mes jeux" : "Créer mon jeu"}
+                        plus={sortedCustoms.length === 0}
+                    />
                 </ScrollView>
             </BottomSheet>
         </View>
