@@ -1,6 +1,6 @@
 import { useRouter } from "expo-router";
-import { useState } from "react";
-import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
+import { useRef, useState } from "react";
+import { KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, TextInput, type TextInputProps, View } from "react-native";
 
 import { getRule } from "@/games";
 import { createGame, todayLabel } from "@/lib/game";
@@ -9,7 +9,7 @@ import { useHistory } from "@/store/useGame";
 import { useColors } from "@/theme/colors";
 
 import { PrimaryButton } from "../ui/PrimaryButton";
-import { Num, Serif } from "../ui/Txt";
+import { Display, Num } from "../ui/Txt";
 import { GamePicker } from "./GamePicker";
 import { AddPlayerButton, Field, PlayerRow } from "./parts";
 
@@ -20,10 +20,14 @@ function clamp(players: string[], min: number, max: number): string[] {
     return next;
 }
 
+/** Sticky CTA bar height (58 button + 12 top padding) + breathing room. */
+const CTA_CLEARANCE = 88;
+
 export function NewGame() {
     const router = useRouter();
     const c = useColors();
     const history = useHistory();
+    const scroll = useRef<ScrollView>(null);
 
     const [name, setName] = useState("");
     const [ruleId, setRuleId] = useState("defaut");
@@ -44,12 +48,24 @@ export function NewGame() {
         router.push("/game");
     };
 
+    // Lift the focused field above the keyboard. KeyboardAvoidingView shrinks
+    // the form to the space left over, and this scrolls the input that just
+    // took focus into it, clearing the sticky "Démarrer" bar.
+    const reveal: NonNullable<TextInputProps["onFocus"]> = (e) =>
+        scroll.current?.scrollResponderScrollNativeHandleToKeyboard(e.target, CTA_CLEARANCE, true);
+
     return (
-        <View className="flex-1 bg-bg dark:bg-bg-dark">
+        <KeyboardAvoidingView
+            className="flex-1 bg-bg dark:bg-bg-dark"
+            behavior={Platform.OS === "ios" ? "padding" : undefined}
+        >
             <ScrollView
+                ref={scroll}
                 className="flex-1"
                 contentContainerClassName="pt-safe-offset-3 pb-6"
                 keyboardShouldPersistTaps="handled"
+                keyboardDismissMode="on-drag"
+                showsVerticalScrollIndicator={false}
             >
                 <View className="px-6 pt-3">
                     <View className="mb-3.5 flex-row items-center justify-end">
@@ -63,14 +79,9 @@ export function NewGame() {
                             <Num className="text-xs font-bold text-muted">{history.length}</Num>
                         </Pressable>
                     </View>
-                    <Text className="text-[46px] leading-[46px]">
-                        <Serif
-                            style={{ fontStyle: "normal" }}
-                            className="text-ink dark:text-ink-dark"
-                        >
-                            Nouvelle{" "}
-                        </Serif>
-                        <Serif className="text-accent">partie.</Serif>
+                    <Text className="text-[42px] leading-[46px] tracking-[-1.6px]">
+                        <Display className="text-ink dark:text-ink-dark">Nouvelle </Display>
+                        <Display className="text-accent">partie.</Display>
                     </Text>
                 </View>
 
@@ -79,13 +90,16 @@ export function NewGame() {
                         <TextInput
                             value={name}
                             onChangeText={setName}
+                            onFocus={reveal}
                             accessibilityLabel="Nom de la partie"
                             placeholder={todayLabel()}
                             placeholderTextColor={c.muted}
+                            returnKeyType="done"
+                            autoCapitalize="sentences"
                             style={{
                                 borderBottomWidth: 1.5,
-                                borderColor: c.line,
-                                paddingVertical: 10,
+                                borderColor: c.lineStrong,
+                                paddingVertical: 12,
                                 fontSize: 17,
                                 fontWeight: "500",
                                 color: c.ink,
@@ -109,6 +123,7 @@ export function NewGame() {
                                     value={p}
                                     last={i === players.length - 1}
                                     onChange={(v) => setPlayers((arr) => arr.map((x, idx) => (idx === i ? v : x)))}
+                                    onFocus={reveal}
                                     onRemove={players.length > rule.minPlayers ? () => removePlayer(i) : undefined}
                                 />
                             ))}
@@ -121,9 +136,9 @@ export function NewGame() {
                 </View>
             </ScrollView>
 
-            <View className="px-4 pb-safe-offset-4 pt-3">
+            <View className="border-t border-line bg-bg px-4 pb-safe-offset-4 pt-3 dark:border-line-dark dark:bg-bg-dark">
                 <PrimaryButton onPress={start}>Démarrer la partie</PrimaryButton>
             </View>
-        </View>
+        </KeyboardAvoidingView>
     );
 }

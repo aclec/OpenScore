@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { Modal, Pressable, Text, TextInput, View } from "react-native";
+import { KeyboardAvoidingView, Modal, Platform, Pressable, Text, TextInput, View } from "react-native";
 
 import { useColors } from "@/theme/colors";
 
@@ -81,51 +81,58 @@ export function RenameSheet({
             statusBarTranslucent
             supportedOrientations={["portrait", "landscape"]}
         >
-            <Pressable
-                className="flex-1 items-center justify-center bg-night/40 px-6"
-                onPress={onCancel}
+            {/* Centres the dialog in the space left by the keyboard instead of
+                behind it. */}
+            <KeyboardAvoidingView
+                className="flex-1"
+                behavior={Platform.OS === "ios" ? "padding" : "height"}
             >
                 <Pressable
-                    onPress={() => {}}
-                    className="w-full rounded-[18px] bg-surface p-[18px] dark:bg-surface-dark"
+                    className="flex-1 items-center justify-center bg-night/40 px-6"
+                    onPress={onCancel}
                 >
-                    <Text className="text-base font-bold text-ink dark:text-ink-dark">Renommer</Text>
-                    <TextInput
-                        ref={ref}
-                        value={value}
-                        onChangeText={onChange}
-                        accessibilityLabel="Nouveau nom de la partie"
-                        onSubmitEditing={onSave}
-                        returnKeyType="done"
-                        style={{
-                            marginTop: 12,
-                            paddingVertical: 12,
-                            borderBottomWidth: 1.5,
-                            borderColor: c.accent,
-                            fontSize: 16,
-                            color: c.ink,
-                        }}
-                    />
-                    <View className="mt-4 flex-row gap-2">
-                        <Pressable
-                            onPress={onCancel}
-                            accessibilityRole="button"
-                            accessibilityLabel="Annuler"
-                            className="h-11 flex-1 items-center justify-center rounded-xl bg-keymuted active:opacity-70 dark:bg-keymuted-dark"
-                        >
-                            <Text className="text-sm font-semibold text-ink dark:text-ink-dark">Annuler</Text>
-                        </Pressable>
-                        <Pressable
-                            onPress={onSave}
-                            accessibilityRole="button"
-                            accessibilityLabel="Enregistrer le nom"
-                            className="h-11 flex-1 items-center justify-center rounded-xl bg-accent active:opacity-90"
-                        >
-                            <Text className="text-sm font-semibold text-white">OK</Text>
-                        </Pressable>
-                    </View>
+                    <Pressable
+                        onPress={() => {}}
+                        className="w-full rounded-[18px] bg-surface p-[18px] dark:bg-surface-dark"
+                    >
+                        <Text className="text-base font-bold text-ink dark:text-ink-dark">Renommer</Text>
+                        <TextInput
+                            ref={ref}
+                            value={value}
+                            onChangeText={onChange}
+                            accessibilityLabel="Nouveau nom de la partie"
+                            onSubmitEditing={onSave}
+                            returnKeyType="done"
+                            style={{
+                                marginTop: 12,
+                                paddingVertical: 12,
+                                borderBottomWidth: 1.5,
+                                borderColor: c.accent,
+                                fontSize: 16,
+                                color: c.ink,
+                            }}
+                        />
+                        <View className="mt-4 flex-row gap-2">
+                            <Pressable
+                                onPress={onCancel}
+                                accessibilityRole="button"
+                                accessibilityLabel="Annuler"
+                                className="h-11 flex-1 items-center justify-center rounded-xl bg-keymuted active:opacity-70 dark:bg-keymuted-dark"
+                            >
+                                <Text className="text-sm font-semibold text-ink dark:text-ink-dark">Annuler</Text>
+                            </Pressable>
+                            <Pressable
+                                onPress={onSave}
+                                accessibilityRole="button"
+                                accessibilityLabel="Enregistrer le nom"
+                                className="h-11 flex-1 items-center justify-center rounded-xl bg-accent active:opacity-90"
+                            >
+                                <Text className="text-sm font-semibold text-white">OK</Text>
+                            </Pressable>
+                        </View>
+                    </Pressable>
                 </Pressable>
-            </Pressable>
+            </KeyboardAvoidingView>
         </Modal>
     );
 }

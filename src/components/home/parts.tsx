@@ -1,15 +1,15 @@
-import { Pressable, Text, TextInput, View } from "react-native";
+import { Pressable, Text, TextInput, type TextInputProps, View } from "react-native";
 
 import { useColors } from "@/theme/colors";
 
-import { Serif } from "../ui/Txt";
+import { Num } from "../ui/Txt";
 
 /** Uppercase section label with optional trailing control. */
 export function Field({ label, trailing, children }: { label: string; trailing?: React.ReactNode; children: React.ReactNode }) {
     return (
         <View>
             <View className="mb-2.5 flex-row items-center justify-between">
-                <Text className="text-[11px] font-bold uppercase tracking-[1.5px] text-muted">{label}</Text>
+                <Text className="text-xs font-bold uppercase tracking-[1.4px] text-ink2 dark:text-ink2-dark">{label}</Text>
                 {trailing}
             </View>
             {children}
@@ -21,22 +21,25 @@ export function PlayerRow({
     index,
     value,
     onChange,
+    onFocus,
     onRemove,
     last,
 }: {
     index: number;
     value: string;
     onChange: (v: string) => void;
+    onFocus?: TextInputProps["onFocus"];
     onRemove?: () => void;
     last: boolean;
 }) {
     const c = useColors();
     return (
-        <View className={`flex-row items-center gap-3 py-2.5 ${last ? "" : "border-b border-line dark:border-line-dark"}`}>
-            <Serif className="w-[22px] text-[18px] text-muted">{index + 1}.</Serif>
+        <View className={`flex-row items-center gap-3 py-3 ${last ? "" : "border-b border-line dark:border-line-dark"}`}>
+            <Num className="w-[22px] text-[15px] font-bold text-muted">{index + 1}.</Num>
             <TextInputRow
                 value={value}
                 onChange={onChange}
+                onFocus={onFocus}
                 placeholder={`Joueur ${index + 1}`}
                 color={c.ink}
                 muted={c.muted}
@@ -77,12 +80,14 @@ export function AddPlayerButton({ onPress, disabled }: { onPress: () => void; di
 function TextInputRow({
     value,
     onChange,
+    onFocus,
     placeholder,
     color,
     muted,
 }: {
     value: string;
     onChange: (v: string) => void;
+    onFocus?: TextInputProps["onFocus"];
     placeholder: string;
     color: string;
     muted: string;
@@ -91,9 +96,13 @@ function TextInputRow({
         <TextInput
             value={value}
             onChangeText={onChange}
+            onFocus={onFocus}
             accessibilityLabel={placeholder}
             placeholder={placeholder}
             placeholderTextColor={muted}
+            returnKeyType="done"
+            autoCapitalize="words"
+            autoCorrect={false}
             style={{ flex: 1, fontSize: 17, fontWeight: "500", color, padding: 0 }}
         />
     );

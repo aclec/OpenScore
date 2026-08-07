@@ -11,7 +11,7 @@ import { useHistory } from "@/store/useGame";
 import { useColors } from "@/theme/colors";
 
 import { IconButton } from "../ui/IconButton";
-import { Serif } from "../ui/Txt";
+import { Display } from "../ui/Txt";
 import { Chevron, Search } from "../ui/icons";
 import { HistoryCard } from "./HistoryCard";
 
@@ -63,15 +63,12 @@ export function HistoryList() {
             </View>
 
             <View className="px-6 pt-3.5">
-                <Text className="text-[38px] leading-[38px]">
-                    <Serif
-                        style={{ fontStyle: "normal" }}
-                        className="text-ink dark:text-ink-dark"
-                    >
+                <Text className="text-[34px] leading-[38px] tracking-[-1.2px]">
+                    <Display className="text-ink dark:text-ink-dark">
                         {history.length || "Aucune"} {history.length > 1 ? "parties" : "partie"}
-                    </Serif>
+                    </Display>
                     {"\n"}
-                    <Serif className="text-muted">jouées.</Serif>
+                    <Display className="text-muted">jouées.</Display>
                 </Text>
             </View>
 

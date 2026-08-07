@@ -2,7 +2,7 @@
 // Used where a raw color value is needed (drawn icons, dynamic styles) rather
 // than a className. Keep in sync with global.css @theme.
 
-import { Platform, useColorScheme } from "react-native";
+import { useColorScheme } from "react-native";
 
 export type Palette = {
     accent: string;
@@ -70,8 +70,13 @@ export function useColors(): Palette {
     return palette[scheme === "dark" ? "dark" : "light"];
 }
 
-/** Serif display face (the italic accents in headings / round numbers). */
-export const SERIF = Platform.select({ ios: "Georgia", default: "serif" }) as string;
+/**
+ * Display face for screen titles. The system sans (SF Pro / Roboto) at its
+ * heaviest weight: both are hinted for screens, so they stay legible at small
+ * sizes and under Dynamic Type where the old italic serif did not. Single point
+ * of change if a custom family is ever bundled.
+ */
+export const DISPLAY = { fontWeight: "800" as const };
 
 /** Tabular figures so score columns stay aligned. */
 export const TABULAR = { fontVariant: ["tabular-nums" as const] };

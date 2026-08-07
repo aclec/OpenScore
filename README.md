@@ -12,7 +12,7 @@ per-game rules (point caps, round limits, auto-fill, …).
 | Concern         | Choice                                       |
 | --------------- | -------------------------------------------- |
 | Package manager | **bun**                                      |
-| Framework       | Expo SDK **56** (New Architecture on)        |
+| Framework       | Expo SDK **57** (New Architecture on)        |
 | Language        | TypeScript (strict)                          |
 | Navigation      | `expo-router` (file-based, in `src/app/`)    |
 | Styling         | **uniwind** (Tailwind v4) — _not_ NativeWind |

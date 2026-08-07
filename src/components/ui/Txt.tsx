@@ -1,8 +1,8 @@
-// Text helpers: tabular figures and the serif display face.
+// Text helpers: tabular figures and the display face.
 
 import { Text, type TextProps } from "react-native";
 
-import { SERIF, TABULAR } from "@/theme/colors";
+import { DISPLAY, TABULAR } from "@/theme/colors";
 
 /**
  * Text with tabular (monospaced) figures — for scores and totals.
@@ -19,12 +19,12 @@ export function Num({ style, ...rest }: TextProps) {
     );
 }
 
-/** Italic serif display text — the editorial accents in headings. */
-export function Serif({ style, ...rest }: TextProps) {
+/** Display text — screen titles. Pair with tight tracking at large sizes. */
+export function Display({ style, ...rest }: TextProps) {
     return (
         <Text
             {...rest}
-            style={[{ fontFamily: SERIF, fontStyle: "italic" }, style]}
+            style={[DISPLAY, style]}
         />
     );
 }

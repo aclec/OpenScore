@@ -3,7 +3,7 @@ import { Pressable, ScrollView, Text, View } from "react-native";
 
 import type { Game, Round, Totals } from "@/lib/types";
 
-import { Num, Serif } from "../ui/Txt";
+import { Num } from "../ui/Txt";
 
 export type Editing = { roundIndex: number; playerId: string } | null;
 
@@ -48,7 +48,7 @@ export function ScoreGrid({ game, rounds, totals, colW, labelW, rowH, editing, o
                         style={{ width: labelW }}
                         className="items-center justify-center"
                     >
-                        <Serif className="text-[13px] text-muted">n</Serif>
+                        <Text className="text-[11px] font-bold uppercase tracking-[1px] text-muted">n</Text>
                     </View>
                     {game.players.map((p, i) => (
                         <View
@@ -85,7 +85,7 @@ export function ScoreGrid({ game, rounds, totals, colW, labelW, rowH, editing, o
                                     style={{ width: labelW }}
                                     className="items-center justify-center"
                                 >
-                                    {showNumber && <Serif className="text-[15px] text-muted">{ri + 1}</Serif>}
+                                    {showNumber && <Num className="text-[15px] font-semibold text-muted">{ri + 1}</Num>}
                                 </View>
                                 {game.players.map((p, pi) => {
                                     const v = round.scores[p.id];
@@ -151,7 +151,7 @@ export function ScoreGrid({ game, rounds, totals, colW, labelW, rowH, editing, o
                         style={{ width: labelW }}
                         className="items-center justify-center py-3.5"
                     >
-                        <Serif className="text-base text-muted">Σ</Serif>
+                        <Text className="text-base font-bold text-muted">Σ</Text>
                     </View>
                     {game.players.map((p, i) => (
                         <View
